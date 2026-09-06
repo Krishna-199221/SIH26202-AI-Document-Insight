@@ -1,7 +1,6 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, UploadFile, File
 from pydantic import BaseModel
-
-from backend.ai_service import generate_insights
+from backend.ai_service import generate_insights, generate_pdf_insights
 
 
 app = FastAPI(
@@ -33,10 +32,41 @@ def summarize_text(request: TextRequest):
     try:
         result = generate_insights(request.text)
 
-        return  result
+        return result
 
     except Exception as e:
         raise HTTPException(
             status_code=500,
             detail=f"AI processing failed: {str(e)}"
+        )
+
+
+@app.post("/summarize-pdf")
+async def summarize_pdf(file: UploadFile = File(...)):
+    if not file.filename.lower().endswith(".pdf"):
+        raise HTTPException(
+            status_code=400,
+            detail="Only PDF files are supported"
+        )
+
+    try:
+        file_bytes = await file.read()
+
+        if not file_bytes:
+            raise HTTPException(
+                status_code=400,
+                detail="The uploaded PDF is empty"
+            )
+
+        result = generate_pdf_insights(file_bytes)
+
+        return result
+
+    except HTTPException:
+        raise
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"PDF processing failed: {str(e)}"
         )
