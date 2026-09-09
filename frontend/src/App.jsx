@@ -7,6 +7,82 @@ function App() {
   const [result, setResult] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+  const [copied, setCopied] = useState(false)
+  const [darkMode, setDarkMode] = useState(false)
+  const [showResultsPage, setShowResultsPage] = useState(false)
+
+  // =========================
+  // GO TO ANALYZER
+  // =========================
+
+  const goToAnalyzer = () => {
+    // Do NOT clear:
+    // file
+    // text
+    // result
+
+    setShowResultsPage(false)
+    setError("")
+    setCopied(false)
+
+    setTimeout(() => {
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      })
+    }, 50)
+  }
+
+  // =========================
+  // GO TO HOME
+  // =========================
+
+  const goToHome = () => {
+    setShowResultsPage(false)
+    setError("")
+
+    setTimeout(() => {
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      })
+    }, 50)
+  }
+
+  // =========================
+  // VIEW PREVIOUS RESULTS
+  // =========================
+
+  const viewPreviousResults = () => {
+    if (!result) return
+
+    setShowResultsPage(true)
+    setError("")
+    setCopied(false)
+
+    setTimeout(() => {
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      })
+    }, 50)
+  }
+
+  // =========================
+  // INSIGHTS NAVIGATION
+  // =========================
+
+  const goToInsights = () => {
+    if (result) {
+      viewPreviousResults()
+    } else {
+      goToAnalyzer()
+    }
+  }
+
+  // =========================
+  // FILE SELECTION
+  // =========================
 
   const handleFileChange = (event) => {
     const selectedFile = event.target.files[0]
@@ -14,24 +90,44 @@ function App() {
     if (selectedFile) {
       setFile(selectedFile)
       setText("")
+
+      // New document = old result is no longer relevant
       setResult(null)
+
+      setShowResultsPage(false)
       setError("")
+      setCopied(false)
     }
   }
+
+  // =========================
+  // TEXT INPUT
+  // =========================
 
   const handleTextChange = (event) => {
     setText(event.target.value)
     setFile(null)
+
+    // New text = old result is no longer relevant
     setResult(null)
+
+    setShowResultsPage(false)
     setError("")
+    setCopied(false)
   }
+
+  // =========================
+  // ANALYZE DOCUMENT
+  // =========================
 
   const analyzeDocument = async () => {
     setError("")
-    setResult(null)
+    setCopied(false)
 
     if (!file && !text.trim()) {
-      setError("Please upload a PDF or paste some text first.")
+      setError(
+        "Please upload a PDF or paste some text first."
+      )
       return
     }
 
@@ -40,9 +136,17 @@ function App() {
     try {
       let response
 
+      // =========================
+      // PDF ANALYSIS
+      // =========================
+
       if (file) {
         const formData = new FormData()
-        formData.append("file", file)
+
+        formData.append(
+          "file",
+          file
+        )
 
         response = await fetch(
           "http://127.0.0.1:8000/summarize-pdf",
@@ -51,7 +155,13 @@ function App() {
             body: formData,
           }
         )
-      } else {
+      }
+
+      // =========================
+      // TEXT ANALYSIS
+      // =========================
+
+      else {
         response = await fetch(
           "http://127.0.0.1:8000/summarize-text",
           {
@@ -66,212 +176,562 @@ function App() {
         )
       }
 
+      // =========================
+      // READ RESPONSE
+      // =========================
+
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.detail || "AI processing failed.")
+        throw new Error(
+          data.detail ||
+            "AI processing failed."
+        )
       }
 
+      // Save AI result
       setResult(data)
-    } catch (err) {
-      setError(err.message)
-    } finally {
+
+      // Open Results page
+      setShowResultsPage(true)
+
+      // Scroll to top
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      })
+    }
+
+    catch (err) {
+      setError(
+        err.message ||
+          "Something went wrong while analyzing the document."
+      )
+    }
+
+    finally {
       setLoading(false)
     }
   }
 
-  return (
-    <div className="app">
+  // =========================
+  // COPY RESULTS
+  // =========================
 
-      {/* Navigation */}
+  const copyResults = async () => {
+    if (!result) return
+
+    const summaryText = result.summary
+      .map(
+        (item, index) =>
+          `${index + 1}. ${item}`
+      )
+      .join("\n\n")
+
+    const insightsText = result.insights
+      .map(
+        (item, index) =>
+          `${index + 1}. ${item}`
+      )
+      .join("\n\n")
+
+    const actionsText = result.actions
+      .map(
+        (item, index) =>
+          `${index + 1}. ${item}`
+      )
+      .join("\n\n")
+
+    const fullText = `AI DOCUMENT INSIGHTS
+
+SUMMARY
+${summaryText}
+
+KEY INSIGHTS
+${insightsText}
+
+RECOMMENDED ACTIONS
+${actionsText}
+
+Generated by AI DocInsight
+Smart India Hackathon
+`
+
+    try {
+      await navigator.clipboard.writeText(
+        fullText
+      )
+
+      setCopied(true)
+
+      setTimeout(() => {
+        setCopied(false)
+      }, 2500)
+    }
+
+    catch (err) {
+      setError(
+        "Unable to copy results. Please try again."
+      )
+    }
+  }
+
+  // =========================
+  // DOWNLOAD PDF
+  // =========================
+
+  const downloadPDF = () => {
+    if (!result) return
+
+    window.print()
+  }
+
+  // =========================
+  // APP UI
+  // =========================
+
+  return (
+    <div
+      className={
+        darkMode
+          ? "app dark-mode"
+          : "app"
+      }
+    >
+
+      {/* ==================================================
+          NAVIGATION
+      ================================================== */}
+
       <nav className="navbar">
+
         <div className="brand">
-          <div className="brand-icon">✦</div>
+
+          <div className="brand-icon">
+            ✦
+          </div>
 
           <div>
-            <div className="brand-name">AI DocInsight</div>
+
+            <div className="brand-name">
+              AI DocInsight
+            </div>
+
             <div className="brand-tagline">
               From Documents to Decisions
             </div>
+
           </div>
+
         </div>
+
 
         <div className="nav-links">
-          <a href="#home">Home</a>
-          <a href="#analyzer">Analyzer</a>
-          <a href="#results">Insights</a>
-        </div>
 
-        <div className="secure-badge">
-          ✦ Smart • Secure • Simple
-        </div>
-      </nav>
-
-      {/* Hero */}
-      <header className="hero" id="home">
-
-        <div className="hero-content">
-
-          <div className="eyebrow">
-            POWERED BY ARTIFICIAL INTELLIGENCE
-          </div>
-
-          <h1>
-            AI Document
-            <span> Insight Generator</span>
-          </h1>
-
-          <p>
-            Transform documents into concise summaries, meaningful insights,
-            and actionable information using Artificial Intelligence.
-          </p>
-
-          <div className="feature-pills">
-            <div className="feature-pill blue">
-              ⚡ Fast Analysis
-            </div>
-
-            <div className="feature-pill purple">
-              ✦ Intelligent Insights
-            </div>
-
-            <div className="feature-pill cyan">
-              ◫ PDF & Text Support
-            </div>
-          </div>
-
-        </div>
-
-        <div className="hero-orb">
-          <div className="orb-core">✦</div>
-        </div>
-
-      </header>
-
-      {/* Analyzer */}
-      <main className="container" id="analyzer">
-
-        <section className="analyzer-card">
-
-          {/* Tabs */}
-          <div className="tabs">
-
-            <button
-              className={activeTab === "upload" ? "tab active" : "tab"}
-              onClick={() => setActiveTab("upload")}
-            >
-              📄 Upload Document
-            </button>
-
-            <button
-              className={activeTab === "text" ? "tab active" : "tab"}
-              onClick={() => setActiveTab("text")}
-            >
-              ☷ Paste Text
-            </button>
-
-          </div>
-
-          {/* Upload mode */}
-          {activeTab === "upload" && (
-            <div className="upload-area">
-
-              <div className="upload-glow-icon">
-                ↑
-              </div>
-
-              <h2>Upload a PDF Document</h2>
-
-              <p>
-                Choose a text-based PDF from your computer
-              </p>
-
-              <label className="file-button">
-                📄 Choose File
-
-                <input
-                  type="file"
-                  accept=".pdf,application/pdf"
-                  onChange={handleFileChange}
-                />
-              </label>
-
-              {file ? (
-                <div className="selected-file">
-                  ✓ {file.name}
-                </div>
-              ) : (
-                <div className="file-placeholder">
-                  No file chosen
-                </div>
-              )}
-
-              <div className="supported">
-                Supported format: PDF (text-based)
-              </div>
-
-            </div>
-          )}
-
-          {/* Text mode */}
-          {activeTab === "text" && (
-            <div className="text-area-wrapper">
-
-              <div className="text-icon">
-                ✎
-              </div>
-
-              <h2>Paste Your Document Text</h2>
-
-              <p>
-                Add the text you want AI to analyze
-              </p>
-
-              <textarea
-                value={text}
-                onChange={handleTextChange}
-                placeholder="Paste your document text here..."
-              />
-
-            </div>
-          )}
-
-          {/* Analyze button */}
           <button
-            className="analyze-button"
-            onClick={analyzeDocument}
-            disabled={loading}
+            className="nav-link-button"
+            onClick={goToHome}
           >
-            {loading ? (
-              <>
-                <span className="spinner"></span>
-                Analyzing with AI...
-              </>
-            ) : (
-              <>
-                ✦ Analyze Document →
-              </>
-            )}
+            Home
           </button>
 
-          <div className="privacy-note">
-            🔒 Your document is processed securely and is not stored.
+          <button
+            className="nav-link-button"
+            onClick={goToAnalyzer}
+          >
+            Analyzer
+          </button>
+
+          <button
+            className="nav-link-button"
+            onClick={goToInsights}
+          >
+            Insights
+          </button>
+
+        </div>
+
+
+        <div className="navbar-actions">
+
+          <div className="secure-badge">
+            ✦ Smart • Secure • Simple
           </div>
 
-          {error && (
-            <div className="error-message">
-              ⚠ {error}
+          <button
+            className="theme-toggle"
+            onClick={() =>
+              setDarkMode(!darkMode)
+            }
+            aria-label="Toggle dark mode"
+            title={
+              darkMode
+                ? "Switch to light mode"
+                : "Switch to dark mode"
+            }
+          >
+            {darkMode
+              ? "☀️"
+              : "🌙"}
+          </button>
+
+        </div>
+
+      </nav>
+
+
+      {/* ==================================================
+          ANALYZER PAGE
+      ================================================== */}
+
+      {!showResultsPage && (
+
+        <>
+
+          {/* ==================================================
+              HERO
+          ================================================== */}
+
+          <header
+            className="hero"
+            id="home"
+          >
+
+            <div className="hero-content">
+
+              <div className="eyebrow">
+                POWERED BY ARTIFICIAL INTELLIGENCE
+              </div>
+
+              <h1>
+                AI Document
+                <span>
+                  {" "}
+                  Insight Generator
+                </span>
+              </h1>
+
+              <p>
+                Transform documents into concise
+                summaries, meaningful insights,
+                and actionable information using
+                Artificial Intelligence.
+              </p>
+
+
+              <div className="feature-pills">
+
+                <div className="feature-pill blue">
+                  ⚡ Fast Analysis
+                </div>
+
+                <div className="feature-pill purple">
+                  ✦ Intelligent Insights
+                </div>
+
+                <div className="feature-pill cyan">
+                  ◫ PDF & Text Support
+                </div>
+
+              </div>
+
             </div>
-          )}
 
-        </section>
 
-        {/* Results */}
-        {result && (
-          <section className="results" id="results">
+            <div className="hero-orb">
+
+              <div className="orb-core">
+                ✦
+              </div>
+
+            </div>
+
+          </header>
+
+
+          {/* ==================================================
+              ANALYZER
+          ================================================== */}
+
+          <main
+            className="container"
+            id="analyzer"
+          >
+
+            <section className="analyzer-card">
+
+              {/* ==================================================
+                  TABS
+              ================================================== */}
+
+              <div className="tabs">
+
+                <button
+                  className={
+                    activeTab === "upload"
+                      ? "tab active"
+                      : "tab"
+                  }
+                  onClick={() =>
+                    setActiveTab("upload")
+                  }
+                >
+                  📄 Upload Document
+                </button>
+
+
+                <button
+                  className={
+                    activeTab === "text"
+                      ? "tab active"
+                      : "tab"
+                  }
+                  onClick={() =>
+                    setActiveTab("text")
+                  }
+                >
+                  ☷ Paste Text
+                </button>
+
+              </div>
+
+
+              {/* ==================================================
+                  UPLOAD MODE
+              ================================================== */}
+
+              {activeTab === "upload" && (
+
+                <div className="upload-area">
+
+                  <div className="upload-glow-icon">
+                    ↑
+                  </div>
+
+                  <h2>
+                    Upload a PDF Document
+                  </h2>
+
+                  <p>
+                    Choose a text-based PDF
+                    from your computer
+                  </p>
+
+
+                  <label className="file-button">
+
+                    📄 Choose File
+
+                    <input
+                      type="file"
+                      accept=".pdf,application/pdf"
+                      onChange={
+                        handleFileChange
+                      }
+                    />
+
+                  </label>
+
+
+                  {file ? (
+
+                    <div className="selected-file">
+                      ✓ {file.name}
+                    </div>
+
+                  ) : (
+
+                    <div className="file-placeholder">
+                      No file chosen
+                    </div>
+
+                  )}
+
+
+                  <div className="supported">
+                    Supported format:
+                    PDF (text-based)
+                  </div>
+
+                </div>
+
+              )}
+
+
+              {/* ==================================================
+                  TEXT MODE
+              ================================================== */}
+
+              {activeTab === "text" && (
+
+                <div className="text-area-wrapper">
+
+                  <div className="text-icon">
+                    ✎
+                  </div>
+
+                  <h2>
+                    Paste Your Document Text
+                  </h2>
+
+                  <p>
+                    Add the text you want
+                    AI to analyze
+                  </p>
+
+
+                  <textarea
+                    value={text}
+                    onChange={
+                      handleTextChange
+                    }
+                    placeholder="Paste your document text here..."
+                  />
+
+                </div>
+
+              )}
+
+
+              {/* ==================================================
+                  ANALYZE BUTTON
+              ================================================== */}
+
+              <button
+                className="analyze-button"
+                onClick={
+                  analyzeDocument
+                }
+                disabled={loading}
+              >
+
+                {loading ? (
+
+                  <>
+                    <span className="spinner"></span>
+                    Analyzing with AI...
+                  </>
+
+                ) : (
+
+                  <>
+                    ✦ Analyze Document →
+                  </>
+
+                )}
+
+              </button>
+
+
+              {/* ==================================================
+                  PRIVACY NOTE
+              ================================================== */}
+
+              <div className="privacy-note">
+                🔒 Your document is processed
+                securely and is not stored.
+              </div>
+
+
+              {/* ==================================================
+                  ERROR
+              ================================================== */}
+
+              {error && (
+
+                <div className="error-message">
+                  ⚠ {error}
+                </div>
+
+              )}
+
+
+              {/* ==================================================
+                  PREVIOUS RESULT
+              ================================================== */}
+
+              {result && !loading && (
+
+                <div className="previous-result-box">
+
+                  <div className="previous-result-icon">
+                    📊
+                  </div>
+
+
+                  <div className="previous-result-content">
+
+                    <div className="previous-result-title">
+                      Previous Analysis Available
+                    </div>
+
+                    <div className="previous-result-text">
+                      Your previous AI analysis is
+                      still available. You can view
+                      it again without analyzing the
+                      document again.
+                    </div>
+
+                  </div>
+
+
+                  <button
+                    className="previous-result-button"
+                    onClick={
+                      viewPreviousResults
+                    }
+                  >
+                    View Previous Results →
+                  </button>
+
+                </div>
+
+              )}
+
+            </section>
+
+          </main>
+
+        </>
+
+      )}
+
+
+      {/* ==================================================
+          RESULTS PAGE
+      ================================================== */}
+
+      {showResultsPage && result && (
+
+        <main
+          className="container results-page-container"
+        >
+
+          <section
+            className="results results-page"
+            id="results"
+          >
+
+            {/* ==================================================
+                BACK BUTTON
+            ================================================== */}
+
+            <button
+              className="back-button"
+              onClick={goToAnalyzer}
+            >
+              ← Back to Analyzer
+            </button>
+
+
+            {/* ==================================================
+                RESULTS HEADER
+            ================================================== */}
 
             <div className="results-heading">
+
               <div>
+
                 <div className="eyebrow">
                   AI ANALYSIS COMPLETE
                 </div>
@@ -279,88 +739,216 @@ function App() {
                 <h2>
                   Your Document Insights
                 </h2>
+
               </div>
 
-              <div className="success-badge">
-                ✓ Analysis Complete
+
+              <div className="results-controls">
+
+                <div className="success-badge">
+                  ✓ Analysis Complete
+                </div>
+
+
+                <button
+                  className="result-action-button copy-button"
+                  onClick={
+                    copyResults
+                  }
+                >
+                  {copied
+                    ? "✓ Copied!"
+                    : "📋 Copy Results"}
+                </button>
+
+
+                <button
+                  className="result-action-button pdf-button"
+                  onClick={
+                    downloadPDF
+                  }
+                >
+                  📄 Download PDF
+                </button>
+
               </div>
+
             </div>
 
-            {/* Summary */}
+
+            {/* ==================================================
+                SUMMARY
+            ================================================== */}
+
             <div className="result-card summary-card">
 
               <div className="result-icon">
                 📋
               </div>
 
+
               <div className="result-content">
-                <h3>Summary</h3>
+
+                <h3>
+
+                  Summary
+
+                  <span className="result-count">
+                    {result.summary.length}
+                    {" "}
+                    points
+                  </span>
+
+                </h3>
+
 
                 <ul>
-                  {result.summary.map((item, index) => (
-                    <li key={index}>
-                      {item}
-                    </li>
-                  ))}
+
+                  {result.summary.map(
+                    (item, index) => (
+
+                      <li key={index}>
+                        {item}
+                      </li>
+
+                    )
+                  )}
+
                 </ul>
+
               </div>
 
             </div>
 
-            {/* Insights */}
+
+            {/* ==================================================
+                KEY INSIGHTS
+            ================================================== */}
+
             <div className="result-card insight-card">
 
               <div className="result-icon">
                 💡
               </div>
 
+
               <div className="result-content">
-                <h3>Key Insights</h3>
+
+                <h3>
+
+                  Key Insights
+
+                  <span className="result-count">
+                    {result.insights.length}
+                    {" "}
+                    insights
+                  </span>
+
+                </h3>
+
 
                 <div className="insight-list">
-                  {result.insights.map((item, index) => (
-                    <div className="insight-item" key={index}>
 
-                      <div className="insight-number">
-                        0{index + 1}
+                  {result.insights.map(
+                    (item, index) => (
+
+                      <div
+                        className="insight-item"
+                        key={index}
+                      >
+
+                        <div className="insight-number">
+                          {String(
+                            index + 1
+                          ).padStart(
+                            2,
+                            "0"
+                          )}
+                        </div>
+
+
+                        <p>
+                          {item}
+                        </p>
+
                       </div>
 
-                      <p>{item}</p>
+                    )
+                  )}
 
-                    </div>
-                  ))}
                 </div>
+
               </div>
 
             </div>
 
-            {/* Actions */}
+
+            {/* ==================================================
+                RECOMMENDED ACTIONS
+            ================================================== */}
+
             <div className="result-card action-card">
 
               <div className="result-icon">
                 ✓
               </div>
 
-              <div className="result-content">
-                <h3>Recommended Actions</h3>
 
-                <ul>
-                  {result.actions.map((item, index) => (
-                    <li key={index}>
-                      {item}
-                    </li>
-                  ))}
-                </ul>
+              <div className="result-content">
+
+                <h3>
+
+                  Recommended Actions
+
+                  <span className="result-count">
+                    {result.actions.length}
+                    {" "}
+                    actions
+                  </span>
+
+                </h3>
+
+
+                {result.actions.length > 0 ? (
+
+                  <ul>
+
+                    {result.actions.map(
+                      (item, index) => (
+
+                        <li key={index}>
+                          {item}
+                        </li>
+
+                      )
+                    )}
+
+                  </ul>
+
+                ) : (
+
+                  <p className="no-actions">
+                    No specific actions were
+                    identified from this document.
+                  </p>
+
+                )}
+
               </div>
 
             </div>
 
           </section>
-        )}
 
-      </main>
+        </main>
 
-      {/* Footer */}
+      )}
+
+
+      {/* ==================================================
+          FOOTER
+      ================================================== */}
+
       <footer className="footer">
 
         <div>

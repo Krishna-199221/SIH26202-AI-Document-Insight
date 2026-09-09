@@ -34,8 +34,8 @@ Return ONLY valid JSON using exactly this structure:
 }}
 
 SUMMARY REQUIREMENTS:
-- Provide 8 to 10 bullet points.
-- Each bullet point must contain 4 to 5 complete sentences.
+- Provide 6 to 8 bullet points.
+- Each bullet point must contain 2 to 3 complete sentences.
 - Explain the important concepts, relationships, findings, processes,
   evidence, examples, and implications found in the document.
 - Preserve important facts, numbers, technical terminology, and examples.
@@ -59,7 +59,7 @@ KEY INSIGHTS REQUIREMENTS:
 - Do not invent information that is not supported by the document.
 
 RECOMMENDED ACTION REQUIREMENTS:
-- Provide 6 to 8 detailed action items when the document supports
+- Provide 6 to 7 detailed action items when the document supports
   meaningful recommendations.
 - Each action should explain:
   1. What should be done.
@@ -138,7 +138,7 @@ Return ONLY valid JSON using exactly this structure:
 
 SUMMARY REQUIREMENTS:
 - Provide 8 to 10 bullet points.
-- Each bullet point must contain 4 to 5 complete sentences.
+- Each bullet point must contain 2 to 3 complete sentences.
 - Explain the important concepts, relationships, findings, processes,
   evidence, examples, and implications found in the document.
 - Preserve important facts, numbers, technical terminology, and examples.
