@@ -3,16 +3,35 @@ import { useState } from "react"
 function App() {
   const [file, setFile] = useState(null)
   const [text, setText] = useState("")
+  const [activeTab, setActiveTab] = useState("upload")
   const [result, setResult] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+
+  const handleFileChange = (event) => {
+    const selectedFile = event.target.files[0]
+
+    if (selectedFile) {
+      setFile(selectedFile)
+      setText("")
+      setResult(null)
+      setError("")
+    }
+  }
+
+  const handleTextChange = (event) => {
+    setText(event.target.value)
+    setFile(null)
+    setResult(null)
+    setError("")
+  }
 
   const analyzeDocument = async () => {
     setError("")
     setResult(null)
 
     if (!file && !text.trim()) {
-      setError("Please upload a PDF or paste some text.")
+      setError("Please upload a PDF or paste some text first.")
       return
     }
 
@@ -50,7 +69,7 @@ function App() {
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.detail || "Something went wrong.")
+        throw new Error(data.detail || "AI processing failed.")
       }
 
       setResult(data)
@@ -63,112 +82,301 @@ function App() {
 
   return (
     <div className="app">
-      <header className="hero">
-        <h1>AI Document Insight Generator</h1>
-        <p>
-          Upload a document or paste text to generate AI-powered insights.
-        </p>
+
+      {/* Navigation */}
+      <nav className="navbar">
+        <div className="brand">
+          <div className="brand-icon">✦</div>
+
+          <div>
+            <div className="brand-name">AI DocInsight</div>
+            <div className="brand-tagline">
+              From Documents to Decisions
+            </div>
+          </div>
+        </div>
+
+        <div className="nav-links">
+          <a href="#home">Home</a>
+          <a href="#analyzer">Analyzer</a>
+          <a href="#results">Insights</a>
+        </div>
+
+        <div className="secure-badge">
+          ✦ Smart • Secure • Simple
+        </div>
+      </nav>
+
+      {/* Hero */}
+      <header className="hero" id="home">
+
+        <div className="hero-content">
+
+          <div className="eyebrow">
+            POWERED BY ARTIFICIAL INTELLIGENCE
+          </div>
+
+          <h1>
+            AI Document
+            <span> Insight Generator</span>
+          </h1>
+
+          <p>
+            Transform documents into concise summaries, meaningful insights,
+            and actionable information using Artificial Intelligence.
+          </p>
+
+          <div className="feature-pills">
+            <div className="feature-pill blue">
+              ⚡ Fast Analysis
+            </div>
+
+            <div className="feature-pill purple">
+              ✦ Intelligent Insights
+            </div>
+
+            <div className="feature-pill cyan">
+              ◫ PDF & Text Support
+            </div>
+          </div>
+
+        </div>
+
+        <div className="hero-orb">
+          <div className="orb-core">✦</div>
+        </div>
+
       </header>
 
-      <main className="container">
-        <section className="input-card">
-          <h2>Analyze Your Document</h2>
+      {/* Analyzer */}
+      <main className="container" id="analyzer">
 
-          <div className="upload-box">
-            <div className="upload-icon">📄</div>
+        <section className="analyzer-card">
 
-            <h3>Upload a PDF</h3>
+          {/* Tabs */}
+          <div className="tabs">
 
-            <p>Choose a text-based PDF from your computer</p>
+            <button
+              className={activeTab === "upload" ? "tab active" : "tab"}
+              onClick={() => setActiveTab("upload")}
+            >
+              📄 Upload Document
+            </button>
 
-            <input
-              type="file"
-              accept=".pdf,application/pdf"
-              onChange={(event) => {
-                setFile(event.target.files[0])
-                setText("")
-                setResult(null)
-                setError("")
-              }}
-            />
+            <button
+              className={activeTab === "text" ? "tab active" : "tab"}
+              onClick={() => setActiveTab("text")}
+            >
+              ☷ Paste Text
+            </button>
 
-            {file && (
-              <p className="file-name">
-                Selected: {file.name}
+          </div>
+
+          {/* Upload mode */}
+          {activeTab === "upload" && (
+            <div className="upload-area">
+
+              <div className="upload-glow-icon">
+                ↑
+              </div>
+
+              <h2>Upload a PDF Document</h2>
+
+              <p>
+                Choose a text-based PDF from your computer
               </p>
-            )}
-          </div>
 
-          <div className="divider">
-            <span>OR</span>
-          </div>
+              <label className="file-button">
+                📄 Choose File
 
-          <div className="text-section">
-            <h3>Paste Text</h3>
+                <input
+                  type="file"
+                  accept=".pdf,application/pdf"
+                  onChange={handleFileChange}
+                />
+              </label>
 
-            <textarea
-              placeholder="Paste your document text here..."
-              value={text}
-              onChange={(event) => {
-                setText(event.target.value)
-                setFile(null)
-                setResult(null)
-                setError("")
-              }}
-            />
-          </div>
+              {file ? (
+                <div className="selected-file">
+                  ✓ {file.name}
+                </div>
+              ) : (
+                <div className="file-placeholder">
+                  No file chosen
+                </div>
+              )}
 
+              <div className="supported">
+                Supported format: PDF (text-based)
+              </div>
+
+            </div>
+          )}
+
+          {/* Text mode */}
+          {activeTab === "text" && (
+            <div className="text-area-wrapper">
+
+              <div className="text-icon">
+                ✎
+              </div>
+
+              <h2>Paste Your Document Text</h2>
+
+              <p>
+                Add the text you want AI to analyze
+              </p>
+
+              <textarea
+                value={text}
+                onChange={handleTextChange}
+                placeholder="Paste your document text here..."
+              />
+
+            </div>
+          )}
+
+          {/* Analyze button */}
           <button
             className="analyze-button"
             onClick={analyzeDocument}
             disabled={loading}
           >
-            {loading ? "Analyzing..." : "Analyze Document"}
+            {loading ? (
+              <>
+                <span className="spinner"></span>
+                Analyzing with AI...
+              </>
+            ) : (
+              <>
+                ✦ Analyze Document →
+              </>
+            )}
           </button>
+
+          <div className="privacy-note">
+            🔒 Your document is processed securely and is not stored.
+          </div>
 
           {error && (
             <div className="error-message">
-              {error}
+              ⚠ {error}
             </div>
           )}
+
         </section>
 
+        {/* Results */}
         {result && (
-          <section className="results">
-            <h2>Analysis Result</h2>
+          <section className="results" id="results">
 
-            <div className="result-card">
-              <h3>📋 Summary</h3>
+            <div className="results-heading">
+              <div>
+                <div className="eyebrow">
+                  AI ANALYSIS COMPLETE
+                </div>
 
-              <ul>
-                {result.summary.map((item, index) => (
-                  <li key={index}>{item}</li>
-                ))}
-              </ul>
+                <h2>
+                  Your Document Insights
+                </h2>
+              </div>
+
+              <div className="success-badge">
+                ✓ Analysis Complete
+              </div>
             </div>
 
-            <div className="result-card">
-              <h3>💡 Key Insights</h3>
+            {/* Summary */}
+            <div className="result-card summary-card">
 
-              <ol>
-                {result.insights.map((item, index) => (
-                  <li key={index}>{item}</li>
-                ))}
-              </ol>
+              <div className="result-icon">
+                📋
+              </div>
+
+              <div className="result-content">
+                <h3>Summary</h3>
+
+                <ul>
+                  {result.summary.map((item, index) => (
+                    <li key={index}>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
             </div>
 
-            <div className="result-card">
-              <h3>✅ Action Items</h3>
+            {/* Insights */}
+            <div className="result-card insight-card">
 
-              <ul>
-                {result.actions.map((item, index) => (
-                  <li key={index}>{item}</li>
-                ))}
-              </ul>
+              <div className="result-icon">
+                💡
+              </div>
+
+              <div className="result-content">
+                <h3>Key Insights</h3>
+
+                <div className="insight-list">
+                  {result.insights.map((item, index) => (
+                    <div className="insight-item" key={index}>
+
+                      <div className="insight-number">
+                        0{index + 1}
+                      </div>
+
+                      <p>{item}</p>
+
+                    </div>
+                  ))}
+                </div>
+              </div>
+
             </div>
+
+            {/* Actions */}
+            <div className="result-card action-card">
+
+              <div className="result-icon">
+                ✓
+              </div>
+
+              <div className="result-content">
+                <h3>Recommended Actions</h3>
+
+                <ul>
+                  {result.actions.map((item, index) => (
+                    <li key={index}>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+            </div>
+
           </section>
         )}
+
       </main>
+
+      {/* Footer */}
+      <footer className="footer">
+
+        <div>
+          AI DocInsight
+        </div>
+
+        <div>
+          Smart India Hackathon
+        </div>
+
+        <div>
+          Ideas for a Better India 🇮🇳
+        </div>
+
+      </footer>
+
     </div>
   )
 }
