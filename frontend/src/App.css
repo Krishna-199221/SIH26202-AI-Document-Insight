@@ -2647,3 +2647,24 @@ textarea {
     padding: 28px 20px;
   }
 }
+
+/* =========================================
+   RESULT TEXT ALIGNMENT FIX
+   Keep wrapped result points consistently left-aligned.
+   ========================================= */
+
+.result-content li,
+.result-content p {
+  text-align: left;
+}
+
+.insight-item {
+  text-align: left;
+}
+
+@media print {
+  .result-content li,
+  .result-content p {
+    text-align: left !important;
+  }
+}

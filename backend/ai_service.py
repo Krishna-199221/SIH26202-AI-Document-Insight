@@ -23,20 +23,37 @@ Return ONLY valid JSON using exactly this structure:
 
 {{
     "summary": [
-        "8 to 10 detailed summary bullet points"
+        "Short Title: Detailed explanation of the important point."
     ],
     "insights": [
-        "8 important and detailed insights"
+        "Short Title: Detailed explanation of the insight."
     ],
     "actions": [
-        "6 to 8 detailed recommended action items when applicable"
+        "Short Title: Detailed recommended action."
     ]
 }}
 
+IMPORTANT TITLE FORMATTING:
+- Every Summary point MUST begin with a short, meaningful title followed by a colon.
+- Every Key Insight MUST begin with a short, meaningful title followed by a colon.
+- Every Recommended Action MUST begin with a short, meaningful title followed by a colon.
+- Titles should normally contain 2 to 7 words.
+- Titles must be specific to the document.
+- Do NOT use generic titles such as "Summary Point 1", "Insight 1", or "Action 1".
+- The title must clearly describe the main idea of that particular point.
+- Put the detailed explanation immediately after the colon.
+- Do NOT use Markdown formatting such as ** or ## in the JSON.
+- Example Summary:
+  "Core Methodology: The document explains..."
+- Example Insight:
+  "Dynamic Memory Optimization: The use of linked lists..."
+- Example Action:
+  "Improve Memory Management: Implement..."
+
 SUMMARY REQUIREMENTS:
-- Provide 6 to 8 bullet points.
-- Each bullet point must contain 2 to 3 complete sentences.
-- Explain the important concepts, relationships, findings, processes,
+- Provide 8 to 10 important summary points.
+- Each point should contain 2 to 3 complete sentences.
+- Explain important concepts, relationships, findings, processes,
   evidence, examples, and implications found in the document.
 - Preserve important facts, numbers, technical terminology, and examples.
 - Connect related information instead of listing isolated facts.
@@ -44,7 +61,7 @@ SUMMARY REQUIREMENTS:
   without reading the entire original document.
 - Do not make the summary generic, repetitive, or superficial.
 - Do not simply copy sentences from the document.
-- Every bullet should contain meaningful information.
+- Every point must contain meaningful information.
 
 KEY INSIGHTS REQUIREMENTS:
 - Provide exactly 8 important insights.
@@ -59,7 +76,7 @@ KEY INSIGHTS REQUIREMENTS:
 - Do not invent information that is not supported by the document.
 
 RECOMMENDED ACTION REQUIREMENTS:
-- Provide 6 to 7 detailed action items when the document supports
+- Provide 6 to 8 detailed action items when the document supports
   meaningful recommendations.
 - Each action should explain:
   1. What should be done.
@@ -106,7 +123,6 @@ def generate_pdf_insights(file_bytes: bytes):
     temp_path = None
 
     try:
-        # Create a temporary PDF file
         with tempfile.NamedTemporaryFile(
             delete=False,
             suffix=".pdf"
@@ -114,7 +130,6 @@ def generate_pdf_insights(file_bytes: bytes):
             temp_file.write(file_bytes)
             temp_path = temp_file.name
 
-        # Upload the actual PDF file to Gemini
         pdf_file = client.files.upload(
             file=temp_path
         )
@@ -126,20 +141,37 @@ Return ONLY valid JSON using exactly this structure:
 
 {
     "summary": [
-        "8 to 10 detailed summary bullet points"
+        "Short Title: Detailed explanation of the important point."
     ],
     "insights": [
-        "8 important and detailed insights"
+        "Short Title: Detailed explanation of the insight."
     ],
     "actions": [
-        "6 to 8 detailed recommended action items when applicable"
+        "Short Title: Detailed recommended action."
     ]
 }
 
+IMPORTANT TITLE FORMATTING:
+- Every Summary point MUST begin with a short, meaningful title followed by a colon.
+- Every Key Insight MUST begin with a short, meaningful title followed by a colon.
+- Every Recommended Action MUST begin with a short, meaningful title followed by a colon.
+- Titles should normally contain 2 to 7 words.
+- Titles must be specific to the document.
+- Do NOT use generic titles such as "Summary Point 1", "Insight 1", or "Action 1".
+- The title must clearly describe the main idea of that particular point.
+- Put the detailed explanation immediately after the colon.
+- Do NOT use Markdown formatting such as ** or ## in the JSON.
+- Example Summary:
+  "Core Methodology: The document explains..."
+- Example Insight:
+  "Dynamic Memory Optimization: The use of linked lists..."
+- Example Action:
+  "Improve Memory Management: Implement..."
+
 SUMMARY REQUIREMENTS:
-- Provide 8 to 10 bullet points.
-- Each bullet point must contain 2 to 3 complete sentences.
-- Explain the important concepts, relationships, findings, processes,
+- Provide 8 to 10 important summary points.
+- Each point should contain 2 to 3 complete sentences.
+- Explain important concepts, relationships, findings, processes,
   evidence, examples, and implications found in the document.
 - Preserve important facts, numbers, technical terminology, and examples.
 - Connect related information instead of listing isolated facts.
@@ -147,7 +179,7 @@ SUMMARY REQUIREMENTS:
   without reading the entire original document.
 - Do not make the summary generic, repetitive, or superficial.
 - Do not simply copy sentences from the document.
-- Every bullet should contain meaningful information.
+- Every point must contain meaningful information.
 
 KEY INSIGHTS REQUIREMENTS:
 - Provide exactly 8 important insights.
@@ -202,6 +234,5 @@ Focus only on information contained in the PDF.
                     raise
 
     finally:
-        # Delete temporary PDF from our computer
         if temp_path and os.path.exists(temp_path):
             os.remove(temp_path)

@@ -1,5 +1,25 @@
 import { useState } from "react"
 
+function renderInsightText(text) {
+  if (!text) return null
+
+  const separatorIndex = text.indexOf(":")
+
+  if (separatorIndex === -1) {
+    return text
+  }
+
+  const title = text.slice(0, separatorIndex + 1)
+  const description = text.slice(separatorIndex + 1).trim()
+
+  return (
+    <>
+      <strong>{title}</strong>{" "}
+      {description}
+    </>
+  )
+}
+
 function App() {
   const [file, setFile] = useState(null)
   const [text, setText] = useState("")
@@ -912,7 +932,7 @@ Smart India Hackathon
                     (item, index) => (
 
                       <li key={index}>
-                        {item}
+                        {renderInsightText(item)}
                       </li>
 
                     )
@@ -972,7 +992,7 @@ Smart India Hackathon
 
 
                         <p>
-                          {item}
+                          {renderInsightText(item)}
                         </p>
 
                       </div>
@@ -1021,7 +1041,7 @@ Smart India Hackathon
                       (item, index) => (
 
                         <li key={index}>
-                          {item}
+                          {renderInsightText(item)}
                         </li>
 
                       )
