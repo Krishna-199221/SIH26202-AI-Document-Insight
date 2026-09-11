@@ -9,11 +9,12 @@ app = FastAPI(
     description="Backend API for generating AI-powered document insights",
     version="1.0.0"
 )
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:5173",
-        "http://127.0.0.1:5173"
+        "http://127.0.0.1:5173",
         "https://sih26202-ai-document-insight-1.onrender.com"
     ],
     allow_credentials=True,
@@ -82,3 +83,4 @@ async def summarize_pdf(file: UploadFile = File(...)):
             status_code=500,
             detail=f"PDF processing failed: {str(e)}"
         )
+        
