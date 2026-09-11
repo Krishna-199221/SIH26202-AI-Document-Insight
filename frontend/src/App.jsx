@@ -53,6 +53,9 @@ function App() {
     demoAutomations
   )
 
+  // Prototype sources state
+  const [sources, setSources] = useState(demoSources)
+
   // Prototype assistant state
   const [assistantQuestion, setAssistantQuestion] =
     useState("")
@@ -392,6 +395,22 @@ Smart India Hackathon
 
 
   // =========================
+  // SOURCES
+  // =========================
+
+  const addDemoSource = () => {
+    const newSource = {
+      id: Date.now(),
+      name: "New Demo Resource Source",
+      type: "PDF",
+      status: "Processed",
+      date: "11 Sep 2026",
+    }
+
+    setSources((previous) => [newSource, ...previous])
+  }
+
+  // =========================
   // ASSISTANT
   // =========================
 
@@ -665,9 +684,24 @@ Smart India Hackathon
           text="Prototype representation of the different sources InsightX can work with."
         />
 
-        <div className="insight-list">
+        <div
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              marginBottom: "20px",
+            }}
+          >
+            <button
+              className="analyze-button"
+              onClick={addDemoSource}
+            >
+              ＋ Add Demo Source
+            </button>
+          </div>
 
-          {demoSources.map((source) => (
+          <div className="insight-list">
+
+          {sources.map((source) => (
 
             <div
               className="insight-item"
