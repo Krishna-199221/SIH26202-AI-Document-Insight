@@ -522,7 +522,7 @@ Smart India Hackathon
             <div className="v2-header">
               <div>
                 <div className="eyebrow">
-                  INSIGHTX • VERSION 2
+                  INSIGHTX • FULL VERSION COMING SOON
                 </div>
                 <h2>
                   Advanced Intelligence Platform
