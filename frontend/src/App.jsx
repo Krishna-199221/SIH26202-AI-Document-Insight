@@ -1,5 +1,18 @@
 import { useState } from "react"
 
+import {
+  demoDashboard,
+  demoSources,
+  demoDocuments,
+  demoInsights,
+  demoResources,
+  demoAutomations,
+  demoReports,
+  demoAssistantQuestions,
+  demoAssistantAnswer,
+} from "./demoData"
+
+
 function renderInsightText(text) {
   if (!text) return null
 
@@ -19,6 +32,7 @@ function renderInsightText(text) {
     </>
   )
 }
+
 
 function App() {
   const [file, setFile] = useState(null)
@@ -54,6 +68,7 @@ function App() {
     }, 50)
   }
 
+
   // =========================
   // GO TO HOME
   // =========================
@@ -69,6 +84,7 @@ function App() {
       })
     }, 50)
   }
+
 
   // =========================
   // VIEW PREVIOUS RESULTS
@@ -89,6 +105,7 @@ function App() {
     }, 50)
   }
 
+
   // =========================
   // INSIGHTS NAVIGATION
   // =========================
@@ -100,6 +117,7 @@ function App() {
       goToAnalyzer()
     }
   }
+
 
   // =========================
   // FILE SELECTION
@@ -121,6 +139,7 @@ function App() {
     }
   }
 
+
   // =========================
   // TEXT INPUT
   // =========================
@@ -136,6 +155,7 @@ function App() {
     setError("")
     setCopied(false)
   }
+
 
   // =========================
   // ANALYZE DOCUMENT
@@ -235,6 +255,7 @@ function App() {
     }
   }
 
+
   // =========================
   // COPY RESULTS
   // =========================
@@ -297,6 +318,7 @@ Smart India Hackathon
     }
   }
 
+
   // =========================
   // DOWNLOAD PDF
   // =========================
@@ -306,6 +328,7 @@ Smart India Hackathon
 
     window.print()
   }
+
 
   // =========================
   // VERSION 2 DEMO FEATURES
@@ -344,13 +367,16 @@ Smart India Hackathon
     },
   ]
 
+
   const openV2Feature = (feature) => {
     setV2Feature(feature)
   }
 
+
   const closeV2Feature = () => {
     setV2Feature(null)
   }
+
 
   // =========================
   // APP UI
@@ -514,43 +540,56 @@ Smart India Hackathon
 
           </header>
 
+
           {/* ==================================================
               VERSION 2 - ADVANCED INTELLIGENCE PREVIEW
           ================================================== */}
 
           <section className="v2-section">
+
             <div className="v2-header">
+
               <div>
+
                 <div className="eyebrow">
                   INSIGHTX • FULL VERSION COMING SOON
                 </div>
+
                 <h2>
                   Advanced Intelligence Platform
                 </h2>
+
                 <p>
                   A preview of the expanded InsightX vision for
                   multi-source intelligence, comparison, analytics,
                   and decision support.
                 </p>
+
               </div>
 
               <div className="v2-badge">
                 ✦ Prototype Preview
               </div>
+
             </div>
 
+
             <div className="v2-grid">
+
               {version2Features.map((feature) => (
+
                 <button
                   className="v2-feature-card"
                   key={feature.title}
                   onClick={() => openV2Feature(feature)}
                 >
+
                   <div className="v2-feature-icon">
                     {feature.icon}
                   </div>
 
                   <div className="v2-feature-content">
+
                     <div className="v2-feature-title">
                       {feature.title}
                     </div>
@@ -558,6 +597,7 @@ Smart India Hackathon
                     <div className="v2-feature-text">
                       {feature.text}
                     </div>
+
                   </div>
 
                   <div className="v2-feature-arrow">
@@ -567,9 +607,13 @@ Smart India Hackathon
                   <span className="v2-coming-badge">
                     V2
                   </span>
+
                 </button>
+
               ))}
+
             </div>
+
           </section>
 
 
@@ -1074,14 +1118,19 @@ Smart India Hackathon
       ================================================== */}
 
       {v2Feature && (
+
         <div
           className="v2-modal-overlay"
           onClick={closeV2Feature}
         >
+
           <div
             className="v2-modal"
-            onClick={(event) => event.stopPropagation()}
+            onClick={(event) =>
+              event.stopPropagation()
+            }
           >
+
             <button
               className="v2-modal-close"
               onClick={closeV2Feature}
@@ -1123,9 +1172,13 @@ Smart India Hackathon
             >
               Continue Exploring InsightX
             </button>
+
           </div>
+
         </div>
+
       )}
+
 
       {/* ==================================================
           FOOTER
@@ -1150,5 +1203,6 @@ Smart India Hackathon
     </div>
   )
 }
+
 
 export default App
