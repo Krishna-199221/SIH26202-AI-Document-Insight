@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from backend.ai_service import generate_insights, generate_pdf_insights
+from ai_service import generate_insights, generate_pdf_insights
 
 
 app = FastAPI(
