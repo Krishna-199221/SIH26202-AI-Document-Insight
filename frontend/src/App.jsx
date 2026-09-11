@@ -170,7 +170,7 @@ function App() {
         )
 
         response = await fetch(
-          "http://127.0.0.1:8000/summarize-pdf",
+          "https://sih26202-ai-document-insight.onrender.com/summarize-pdf",
           {
             method: "POST",
             body: formData,
@@ -184,7 +184,7 @@ function App() {
 
       else {
         response = await fetch(
-          "http://127.0.0.1:8000/summarize-text",
+          "https://sih26202-ai-document-insight.onrender.com/summarize-text",
           {
             method: "POST",
             headers: {
