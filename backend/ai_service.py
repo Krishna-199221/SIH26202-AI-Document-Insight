@@ -111,8 +111,8 @@ Document:
             return json.loads(response.text)
 
         except Exception as e:
-            if "503" in str(e) and attempt < 2:
-                time.sleep(3)
+            if ("503" in str(e) or "429" in str(e)) and attempt < 2:
+                time.sleep(5)
             else:
                 raise
 
@@ -228,8 +228,8 @@ Focus only on information contained in the PDF.
                 return json.loads(response.text)
 
             except Exception as e:
-                if "503" in str(e) and attempt < 2:
-                    time.sleep(3)
+                if ("503" in str(e) or "429" in str(e)) and attempt < 2:
+                    time.sleep(5)
                 else:
                     raise
 
