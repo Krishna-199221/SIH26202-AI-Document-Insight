@@ -504,6 +504,14 @@ Smart India Hackathon
       <p>
         {text}
       </p>
+
+      <button
+        className="back-button"
+        onClick={goToHome}
+        style={{ marginTop: "20px" }}
+      >
+        ← Back to Home
+      </button>
     </div>
   )
 
