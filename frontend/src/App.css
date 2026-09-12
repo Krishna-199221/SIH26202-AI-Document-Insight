@@ -1296,22 +1296,7 @@ textarea {
    DARK MODE
 ========================================= */
 
-.dark-mode {
-  background:
-    radial-gradient(
-      circle at 15% 10%,
-      rgba(99, 102, 241, 0.12),
-      transparent 30%
-    ),
-    radial-gradient(
-      circle at 85% 20%,
-      rgba(139, 92, 246, 0.10),
-      transparent 30%
-    ),
-    #090b14;
 
-  color: #e5e7eb;
-}
 
 
 /* Navbar */
